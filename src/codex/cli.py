@@ -59,10 +59,54 @@ def detect_evil_twin():
             for b in bssids: print(f"      {b}")
     if not found: print("  OK: no duplicates")
 
-def check_wps():
-    print("[*] WPS check")
-    print("Log into router -> Wireless -> WPS -> DISABLE")
-    print("WPS PINs are brute-forceable in hours.")
+def check_signal():
+    import re as _re, time as _time
+    print("[*] WiFi signal strength + block detector")
+    print("[*] Monitoring for 30 seconds. Ctrl+C to stop early.\n")
+    history = []
+    blocked_count = 0
+    for i in range(15):
+        out = run("termux-wifi-connectioninfo")
+        if not out or "not found" in out.lower():
+            print("termux-api missing. Install Termux:API app.")
+            return
+        rssi_m = _re.search(r'"rssi"\s*:\s*(-?\d+)', out)
+        link_m = _re.search(r'"link_speed_mbps"\s*:\s*(\d+)', out)
+        freq_m = _re.search(r'"frequency_mhz"\s*:\s*(\d+)', out)
+        if rssi_m:
+            rssi = int(rssi_m.group(1))
+            bar = "#" * max(0, (rssi + 100) // 5)
+            print(f"  [{i+1:02d}] RSSI: {rssi:>4} dBm {bar}")
+            history.append(rssi)
+            if rssi > -50:
+                state = "Excellent"
+            elif rssi > -60:
+                state = "Good"
+            elif rssi > -70:
+                state = "Fair"
+            elif rssi > -85:
+                state = "Weak"
+            else:
+                state = "Very weak"
+            print(f"       Status: {state}")
+        else:
+            print(f"  [{i+1:02d}] No signal - possible block/deauth attack!")
+            blocked_count += 1
+        if link_m:
+            print(f"       Link speed: {link_m.group(1)} Mbps")
+        if freq_m:
+            print(f"       Frequency: {freq_m.group(1)} MHz")
+        _time.sleep(2)
+    print("\n[*] Summary:")
+    if history:
+        avg = sum(history) // len(history)
+        print(f"  Average RSSI: {avg} dBm")
+        print(f"  Samples: {len(history)}")
+    if blocked_count > 0:
+        print(f"  WARNING: {blocked_count} samples had NO signal")
+        print("  Possible jamming, deauth attack, or router issue.")
+    else:
+        print("  No signal blocks detected. Connection stable.")
 
 def audit_router():
     gw = "192.168.0.1"
@@ -107,7 +151,7 @@ MENU = [
     ("Scan nearby networks", scan_networks),
     ("Detect Evil Twin",     detect_evil_twin),
     ("Check my encryption",  check_encryption),
-    ("Check WPS",            check_wps),
+    ("WiFi signal + block detector", check_signal),
     ("Audit my router",      audit_router),
     ("Map devices on LAN",   lan_scan),
     ("Detect ARP spoof",     detect_arp_spoof),
