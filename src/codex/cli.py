@@ -147,6 +147,53 @@ def detect_arp_spoof():
             return
     print("  OK: stable")
 
+
+def internet_check():
+    print("[*] Internet Health Check\n")
+    results = []
+
+    # 1. Local link (router)
+    print("  [1/3] Testing local link (router)...")
+    r1 = run("ping -c 3 -W 2 192.168.0.1")
+    local_ok = "0% packet loss" in r1 or "0.0% packet loss" in r1
+    results.append(("Router (192.168.0.1)", local_ok))
+
+    # 2. Internet (IP, no DNS)
+    print("  [2/3] Testing internet (8.8.8.8)...")
+    r2 = run("ping -c 3 -W 2 8.8.8.8")
+    inet_ok = "0% packet loss" in r2 or "0.0% packet loss" in r2
+    results.append(("Internet (8.8.8.8)", inet_ok))
+
+    # 3. DNS
+    print("  [3/3] Testing DNS (google.com)...")
+    r3 = run("ping -c 3 -W 2 google.com")
+    dns_ok = "0% packet loss" in r3 or "0.0% packet loss" in r3
+    results.append(("DNS (google.com)", dns_ok))
+
+    # Summary table
+    print("\n[*] Results:\n")
+    for name, ok in results:
+        status = "OK" if ok else "FAIL"
+        print(f"  {name:<25} {status}")
+
+    # Verdict
+    print("\n[*] Diagnosis:")
+    if all(ok for _, ok in results):
+        print("  Everything works. WiFi + Internet + DNS are all fine.")
+    elif local_ok and not inet_ok:
+        print("  WiFi is fine, but INTERNET is down.")
+        print("  -> Your ISP line is the problem, not your WiFi.")
+        print("  -> Restart the router. If still down, call your ISP.")
+    elif not local_ok:
+        print("  Cannot even reach your router.")
+        print("  -> Check WiFi connection. Move closer to the router.")
+    elif inet_ok and not dns_ok:
+        print("  Internet works but DNS fails.")
+        print("  -> DNS server issue. Try changing DNS to 1.1.1.1 or 8.8.8.8.")
+    else:
+        print("  Mixed results. Retry in a minute.")
+
+
 MENU = [
     ("Scan nearby networks", scan_networks),
     ("Detect Evil Twin",     detect_evil_twin),
@@ -155,6 +202,7 @@ MENU = [
     ("Audit my router",      audit_router),
     ("Map devices on LAN",   lan_scan),
     ("Detect ARP spoof",     detect_arp_spoof),
+    ("Internet health check", internet_check),
     ("Exit",                 None),
 ]
 
