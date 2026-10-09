@@ -22,7 +22,8 @@ Go to android setting → Apps → Termux:API → Permissions → Location → A
 
 Then
 
-Write this to install [Note: After writting this code,write 'Codex' to the terminal to open] Codex
+Write this to install Codex 
+[Note: After writting this code,write 'Codex' to the terminal to.open] 
 ```bash
 pkg update -y && pkg upgrade -y
 pkg install python git
