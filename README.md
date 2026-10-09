@@ -17,7 +17,7 @@ and harden YOUR WiFi setup. It is a blue-team tool — it does not attack.
 ## Install
 Download both Termux and Termux:API from F-droid app
 
-Grand location permission by
+## Grand location permission
 Go to android setting → Apps → Termux:API → Permissions → Location → Allow all the time
 
 Then
