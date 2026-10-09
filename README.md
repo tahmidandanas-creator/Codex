@@ -9,6 +9,7 @@ and harden YOUR WiFi setup. It is a blue-team tool — it does not attack.
 - Scan nearby networks and flag Evil Twin networks
 - Check current WiFi encryption (WEP/WPA/WPA2/WPA3)
 - Check current Wifi signal strength + blocker (within 30 second with 15 frame)
+- Check current Internet health
 - Audit router for open ports (telnet, SSH, UPnP)
 - Map devices on your LAN
 - Detect ARP spoofing
@@ -21,10 +22,10 @@ Go to android setting → Apps → Termux:API → Permissions → Location → A
 
 Then
 
-Write this to install
+Write this to install [Note: After writting this code,write 'Codex' to the terminal to open] Codex
 ```bash
 pkg update -y && pkg upgrade -y
 pkg install python git
 pkg install termux-api nmap netcat-openbsd -y
 pip install git+https://github.com/Scientia/codex.git
-Codex 
+
