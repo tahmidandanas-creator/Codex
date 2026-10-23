@@ -23,10 +23,12 @@ Go to android setting → Apps → Termux:API → Permissions → Location → A
 Then
 
 Write this to install Codex 
-[Note: After writting this code,write 'Codex' to the terminal to.open] 
+[Note: After writting this code,write 'codex' to the terminal to open and write only the last code to upgrade it everytime.]
 ```bash
 pkg update -y && pkg upgrade -y
 pkg install python git
 pkg install termux-api nmap netcat-openbsd -y
 pip install git+https://github.com/Scientia/codex.git
+pip install --upgrade git+https://github.com/tahmidandanas-creator/codex.git
+
 
