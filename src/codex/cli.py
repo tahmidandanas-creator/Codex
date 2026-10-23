@@ -207,6 +207,7 @@ MENU = [
 ]
 
 def main():
+    
     while True:
         clear()
         print(BANNER)
